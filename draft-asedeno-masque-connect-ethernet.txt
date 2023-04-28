@@ -2,7 +2,7 @@
 
 
 
-Multiplexed Application Substrate over QUIC Encryption         A. Sedeño
+Multiplexed Application Substrate over QUIC Encryption      A. R. Sedeño
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                           28 April 2023
 Expires: 30 October 2023
@@ -74,13 +74,22 @@ Table of Contents
    2.  Conventions and Definitions
    3.  Configuration of Clients
    4.  Tunnelling Ethernet over HTTP
+     4.1.  Ethernet Proxy Handling
+     4.2.  HTTP/1.1 Request
+     4.3.  HTTP/1.1 Response
+     4.4.  HTTP/2 and HTTP/3 Requests
+     4.5.  HTTP/2 and HTTP/3 Responses
    5.  Context Identifiers
    6.  HTTP Datagram Payload Format
-   7.  Security Considerations
-   8.  IANA Considerations
-   9.  References
-     9.1.  Normative References
-     9.2.  Informative References
+   7.  Ethernet Frame Handling
+     7.1.  Error Signalling
+   8.  Examples
+     8.1.  Layer 2 VPN
+   9.  Security Considerations
+   10. IANA Considerations
+   11. References
+     11.1.  Normative References
+     11.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -133,9 +142,180 @@ Table of Contents
 
 3.  Configuration of Clients
 
-   TODO config
+   _We don't have the same level of configuration as [CONNECT-IP], such
+   that a URI Template [TEMPLATE] may not make sense.  However, if we
+   write this as a more generic Layer 2 tunnel with an initial Ethernet
+   implementation and extensibility for other Layer 2 protocols, then a
+   template carrying the desired Layer 2 protocol may be worthwhile._
+
+https://${PROXY_HOST}:${PROXY_PORT}/.well-known/masque/l2/
+https://${PROXY_HOST}:${PROXY_PORT}/.well-known/masque/l2/${L2_PROTOCOL}/
 
 4.  Tunnelling Ethernet over HTTP
+
+   To allow negotiation of a tunnel for Ethernet over HTTP, this
+   documetn defines the "connect-l2" HTTP upgrade token.  The resulting
+   Ethernet tunnels use the Capsule Protocol (see Section 3.2 of
+   [HTTP-DGRAM]) with HTTP Datagrams in the format defined in Section 6.
+
+   To initiate an Ethernet tunnel associated with a single HTTP stream,
+   a client issues a request containing the "connect-l2" upgrade token.
+
+   By virtue of the definition of the Capsule Protocol (see Section 3.2
+   of [HTTP-DGRAM]), Ethernet proxying requests do not carry any message
+   content.  Similarly, successful Ethernet proxying responses also do
+   not carry any message content.
+
+   Ethernet proxying over HTTP MUST be operated over TLS or QUIC
+   encryption, or another equivalent encryption protocol, to provide
+   confidentiality, integrity, and authentication.
+
+4.1.  Ethernet Proxy Handling
+
+   Upon receiving an Ethernet proxying request:
+
+   *  if the recipient is configured to use another HTTP proxy, it will
+      act as an intermediary by forwarding the request to another HTTP
+      server.  Note that such intermediaries may need to re-encode the
+      request if they forward it using a version of HTTP that is
+      different from the one used to receive it, as the request encoding
+      differs by version (see below).
+
+   *  otherwise, the recipient will act as an Ethernet proxy.  The
+      Ethernet proxy can choose to reject the Ethernet proxying request
+      or establish an Ethernet tunnel.
+
+   The lifetime of the Ethernet tunnel is tied to the Ethernet proxying
+   request stream.
+
+   A successful response (as defined in Sections 4.3 and 4.5) indicates
+   that the Ethernet proxy has established an Ethernet tunnel and is
+   willing to proxy Ethernet frames.  Any response other than a
+   successful response indicates that the request has failed; thus, the
+   client MUST abort the request.
+
+4.2.  HTTP/1.1 Request
+
+   When using HTTP/1.1 [HTTP/1.1], an Ethernet proxying request will
+   meet the following requirements:
+
+   *  the method SHALL be "GET".
+
+   *  the path SHALL be "/.well-known/masque/l2/"
+
+   *  the request SHALL include a single Host header field containing
+      the host and optional port of the IP proxy.
+
+   *  the request SHALL include a Connection header field with value
+      "Upgrade" (note that this requirement is case-insensitive as per
+      Section 7.6.1 of [HTTP]).
+
+   *  the request SHALL include an Upgrade header field with value
+      "connect-l2".
+
+   An Ethernet proxying request that does not conform to these
+   restrictions is malformed.  The recipient of such a malformed request
+   MUST respond with an error and SHOULD use the 400 (Bad Request)
+   status code.
+
+   _[TODO: Non-Ethernet L2 protocols as an additional path element.]_
+
+   GET https://example.org/.well-known/masque/l2/ HTTP/1.1
+   Host: example.org
+   Connection: Upgrade
+   Upgrade: connect-l2
+   Capsule-Protocol: ?1
+
+                     Figure 1: Example HTTP/1.1 Request
+
+4.3.  HTTP/1.1 Response
+
+   The server indicates a successful response by replying with the
+   following requirements:
+
+   *  the HTTP status code on the response SHALL be 101 (Switching
+      Protocols).
+
+   *  the response SHALL include a Connection header field with value
+      "Upgrade" (note that this requirement is case-insensitive as per
+      Section 7.6.1 of [HTTP]).
+
+   *  the response SHALL include a single Upgrade header field with
+      value "connect-l2".
+
+   *  the response SHALL meet the requirements of HTTP responses that
+      start the Capsule Protocol; see Section 3.2 of [HTTP-DGRAM].
+
+   If any of these requirements are not met, the client MUST treat this
+   proxying attempt as failed and close the connection.
+
+   For example, the server could respond with:
+
+   HTTP/1.1 101 Switching Protocols
+   Connection: Upgrade
+   Upgrade: connect-l2
+   Capsule-Protocol: ?1
+
+                    Figure 2: Example HTTP/1.1 Response
+
+4.4.  HTTP/2 and HTTP/3 Requests
+
+   When using HTTP/2 [HTTP/2] or HTTP/3 [HTTP/3], Ethernet proxying
+   requests use HTTP Extended CONNECT.  This requires that servers send
+   an HTTP Setting as specified in [EXT-CONNECT2] and [EXT-CONNECT3] and
+   that requests use HTTP pseudo-header fields with the following
+   requirements:
+
+   *  The :method pseudo-header field SHALL be "CONNECT".
+
+   *  The :protocol pseudo-header field SHALL be "connect-l2".
+
+   *  The :authority pseudo-header field SHALL contain the authority of
+      the IP proxy.
+
+   *  The :path and :scheme pseudo-header fields SHALL NOT be empty.
+      Their values SHALL contain the scheme and path ...
+
+   _[TODO: uri template, optional layer 2 protocol field, hook for
+   future extensions.]_
+
+   An Ethernet proxying request that does not conform to these
+   restrictions is malformed; see Section 8.1.1 of [HTTP/2] and
+   Section 4.1.2 of [HTTP/3].
+
+   HEADERS
+   :method = CONNECT
+   :protocol = connect-l2
+   :scheme = https
+   :path = /.well-known/masque/l2/
+   :authority = example.org
+   capsule-protocol = ?1
+
+                 Figure 3: Example HTTP/2 or HTTP/3 Request
+
+4.5.  HTTP/2 and HTTP/3 Responses
+
+   The server indicates a successful response by replying with the
+   following requirements:
+
+   *  the HTTP status code on the response SHALL be in the 2xx
+      (Successful) range.
+
+   *  the response SHALL meet the requirements of HTTP responses that
+      start the Capsule Protocol; see Section 3.2 of [HTTP-DGRAM].
+
+   If any of these requirements are not met, the client MUST treat this
+   proxying attempt as failed and abort the request.  As an example, any
+   status code in the 3xx range will be treated as a failure and cause
+   the client to abort the request.
+
+   For example, the server could respond with:
+
+   HEADERS
+   :status = 200
+   capsule-protocol = ?1
+
+                Figure 4: Example HTTP/2 or HTTP/3 Response
 
 5.  Context Identifiers
 
@@ -148,22 +328,22 @@ Table of Contents
    this, all HTTP Datagrams associated with Ethernet proxying requests
    streams start with a Context ID field; see Section 6.
 
-   Context IDs are 62-bit integers (0 to 2^62-1).  Context IDs are
-   encoded as variable-length integers; see Section 16 of [QUIC].  The
-   Context ID value of 0 is reserved for Ethernet payloads, while non-
-   zero values are dynamically allocated.  Non-zero even-numbered
-   Context-IDs are client allocated, and odd-numbered Context IDs are
-   proxy-allocated.  The Context ID namespace is tied to a given HTTP
-   request; it is possible for a Context ID with the same numeric value
-   to be simultaneously allocated in distinct requests, potentially with
+   Context IDs are 62-bit integers (0-2^62-1).  Context IDs are encoded
+   as variable-length integers; see Section 16 of [QUIC].  The Context
+   ID value of 0 is reserved for Ethernet payloads, while non-zero
+   values are dynamically allocated.  Non-zero even-numbered Context-IDs
+   are client allocated, and odd-numbered Context IDs are proxy-
+   allocated.  The Context ID namespace is tied to a given HTTP request;
+   it is possible for a Context ID with the same numeric value to be
+   simultaneously allocated in distinct requests, potentially with
    different semantics.  Context IDs MUST NOT be re-allocated within a
    given HTTP request but MAY be allocated in any order.  The Context ID
    allocation restrictions to the use of even-numbered and odd-numbered
    Context IDs exist in order to avoid the need for synchronization
    between endpoints.  However, once a Context ID has been allocated,
    those restrictions do not apply to the use of the Context ID; it can
-   be used by either the client or the IP proxy, independent of which
-   endpoint initially allocated it.
+   be used by either the client or the Ethernet proxy, independent of
+   which endpoint initially allocated it.
 
    Registration is the action by which an endpoint informs its peer of
    the semantics and format of a given Context ID.  This document does
@@ -178,7 +358,7 @@ Table of Contents
 
    When associated with Ethernet proxying request streams, the HTTP
    Datagram Payload field of HTTP Datagrams (see [HTTP-DGRAM]) has the
-   format defined in Figure 1.  Note that when HTTP Datagrams are
+   format defined in Figure 5.  Note that when HTTP Datagrams are
    encoded using QUIC DATAGRAM frames, the Context ID field defined
    below directly follows the Quarter Stream ID field which is at the
    start of the QUIC DATAGRAM frame payload.
@@ -188,7 +368,7 @@ Table of Contents
      Payload (..),
    }
 
-              Figure 1: Ethernet Proxying HTTP Datagram Format
+              Figure 5: Ethernet Proxying HTTP Datagram Format
 
    The Ethernet Proxying HTTP Datagram Payload contains the following
    fields:
@@ -207,17 +387,91 @@ Table of Contents
    contains a full Layer 2 Ethernet Frame (from the MAC destination
    field until the last byte of the Frame check sequence field).
 
-7.  Security Considerations
+7.  Ethernet Frame Handling
+
+   _TODO: Expand this._
+
+   *  Be like a switch, not a hub.
+
+   *  Handle broadcast and multicast well.
+
+   *  Maybe offload the details to a kernel-level network bridge.
+
+7.1.  Error Signalling
+
+   _TODO: Expand this._
+
+   *  Maybe borrow some bits from L2TPv3 [L2TPv3] for fault signalling
+      via capsule.
+
+8.  Examples
+
+   Some examples; if you can, a Layer 3 option is probably better, but
+   hey, Layer 2.
+
+8.1.  Layer 2 VPN
+
+   The following example shows how a point to point VPN setup where a
+   client appears to be connected to a remote Layer 2 network.
+
+   +--------+                    +--------+            +---> HOST 1
+   |        +--------------------+   L2   |  Layer 2   |
+   | Client |<--Layer 2 Tunnel---|  Proxy +------------+---> HOST 2
+   |        +--------------------+        |  Broadcast |
+   +--------+                    +--------+   Domain   +---> HOST 3
+
+                       Figure 6: L2 VPN Tunnel Setup
+
+   In this case, the client connects to the Ethernet proxy and
+   immediately can start sending ethernet frames to the attached
+   broadcast domain.
+
+   [[ From Client ]]             [[ From IP Proxy ]]
+
+   SETTINGS
+     H3_DATAGRAM = 1
+
+                                 SETTINGS
+                                   ENABLE_CONNECT_PROTOCOL = 1
+                                   H3_DATAGRAM = 1
+
+   STREAM(44): HEADERS
+   :method = CONNECT
+   :protocol = connect-l2
+   :scheme = https
+   :path = /.well-known/masque/l2/
+   :authority = proxy.example.com
+   capsule-protocol = ?1
+
+                                 STREAM(44): HEADERS
+                                 :status = 200
+                                 capsule-protocol = ?1
+
+   DATAGRAM
+   Quarter Stream ID = 11
+   Context ID = 0
+   Payload = Encapsulated Ethernet Frame
+
+                                 DATAGRAM
+                                 Quarter Stream ID = 11
+                                 Context ID = 0
+                                 Payload = Encapsulated Ethernet Frame
+
+                     Figure 7: VPN Full-Tunnel Example
+
+9.  Security Considerations
 
    TODO Security
 
-8.  IANA Considerations
+   *  MAC address collisions?
+
+10.  IANA Considerations
 
    This document has no IANA actions.
 
-9.  References
+11.  References
 
-9.1.  Normative References
+11.1.  Normative References
 
    [CONNECT-UDP]
               Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
@@ -283,14 +537,19 @@ Table of Contents
               STD 7, RFC 9293, DOI 10.17487/RFC9293, August 2022,
               <https://www.rfc-editor.org/rfc/rfc9293>.
 
-9.2.  Informative References
+   [TEMPLATE] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
+              and D. Orchard, "URI Template", RFC 6570,
+              DOI 10.17487/RFC6570, March 2012,
+              <https://www.rfc-editor.org/rfc/rfc6570>.
+
+11.2.  Informative References
 
    [CONNECT-IP]
               Pauly, T., Schinazi, D., Chernyakhovsky, A., Kühlewind,
               M., and M. Westerlund, "Proxying IP in HTTP", Work in
-              Progress, Internet-Draft, draft-ietf-masque-connect-ip-12,
-              20 April 2023, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-masque-connect-ip-12>.
+              Progress, Internet-Draft, draft-ietf-masque-connect-ip-13,
+              28 April 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-masque-connect-ip-13>.
 
    [GUE]      Herbert, T., Yong, L., and O. Zia, "Generic UDP
               Encapsulation", Work in Progress, Internet-Draft, draft-
@@ -301,6 +560,9 @@ Table of Contents
 Acknowledgments
 
    TODO acknowledge.
+
+   Much of the initial version of this draft borrows heavily from
+   [CONNECT-IP].
 
 Author's Address
 
