@@ -4,8 +4,8 @@
 
 Multiplexed Application Substrate over QUIC Encryption         A. Sedeño
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                           27 April 2023
-Expires: 29 October 2023
+Intended status: Standards Track                           28 April 2023
+Expires: 30 October 2023
 
 
                        Proxying Ethernet in HTTP
@@ -29,9 +29,8 @@ About This Document
    this document may be found at https://datatracker.ietf.org/doc/draft-
    asedeno-masque-connect-ethernet/.
 
-   Discussion of this document takes place on the Multiplexed
-   Application Substrate over QUIC Encryption Working Group mailing list
-   (mailto:masque@ietf.org), which is archived at
+   Discussion of this document takes place on the MASQUE Working Group
+   mailing list (mailto:masque@ietf.org), which is archived at
    https://mailarchive.ietf.org/arch/browse/masque/.  Subscribe at
    https://www.ietf.org/mailman/listinfo/masque/.
 
@@ -53,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 October 2023.
+   This Internet-Draft will expire on 30 October 2023.
 
 Copyright Notice
 
@@ -91,8 +90,8 @@ Table of Contents
    creating a TCP [TCP] tunnel to a destination, a similar mechanism for
    UDP [CONNECT-UDP], and an additional mechanism for IP [CONNECT-IP].
    However, these mechanisms can't carry layer 2 frames without further
-   encapsulation inside of IP, for instance with GUE, which imposes an
-   MTU cost.
+   encapsulation inside of IP, for instance with GUE [GUE]or L2TP [L2TP]
+   [L2TPv3], which imposes an MTU cost.
 
    This document describes a protocol for tunnelling Ethernet frames
    through an HTTP server acting as an Ethernet switch over HTTP.  This
@@ -220,6 +219,11 @@ Table of Contents
 
 9.1.  Normative References
 
+   [CONNECT-UDP]
+              Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
+              DOI 10.17487/RFC9298, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9298>.
+
    [EXT-CONNECT2]
               McManus, P., "Bootstrapping WebSockets with HTTP/2",
               RFC 8441, DOI 10.17487/RFC8441, September 2018,
@@ -251,6 +255,16 @@ Table of Contents
    [HTTP/3]   Bishop, M., Ed., "HTTP/3", RFC 9114, DOI 10.17487/RFC9114,
               June 2022, <https://www.rfc-editor.org/rfc/rfc9114>.
 
+   [L2TP]     Townsley, W., Valencia, A., Rubens, A., Pall, G., Zorn,
+              G., and B. Palter, "Layer Two Tunneling Protocol "L2TP"",
+              RFC 2661, DOI 10.17487/RFC2661, August 1999,
+              <https://www.rfc-editor.org/rfc/rfc2661>.
+
+   [L2TPv3]   Lau, J., Ed., Townsley, M., Ed., and I. Goyret, Ed.,
+              "Layer Two Tunneling Protocol - Version 3 (L2TPv3)",
+              RFC 3931, DOI 10.17487/RFC3931, March 2005,
+              <https://www.rfc-editor.org/rfc/rfc3931>.
+
    [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", RFC 9000,
               DOI 10.17487/RFC9000, May 2021,
@@ -271,10 +285,18 @@ Table of Contents
 
 9.2.  Informative References
 
-   [CONNECT-UDP]
-              Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
-              DOI 10.17487/RFC9298, August 2022,
-              <https://www.rfc-editor.org/rfc/rfc9298>.
+   [CONNECT-IP]
+              Pauly, T., Schinazi, D., Chernyakhovsky, A., Kühlewind,
+              M., and M. Westerlund, "Proxying IP in HTTP", Work in
+              Progress, Internet-Draft, draft-ietf-masque-connect-ip-12,
+              20 April 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-masque-connect-ip-12>.
+
+   [GUE]      Herbert, T., Yong, L., and O. Zia, "Generic UDP
+              Encapsulation", Work in Progress, Internet-Draft, draft-
+              ietf-intarea-gue-09, 26 October 2019,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-intarea-
+              gue-09>.
 
 Acknowledgments
 
