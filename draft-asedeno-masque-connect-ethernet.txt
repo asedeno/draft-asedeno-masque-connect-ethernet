@@ -204,7 +204,7 @@ https://${PROXY_HOST}:${PROXY_PORT}/.well-known/masque/l2/${L2_PROTOCOL}/
    *  the path SHALL be "/.well-known/masque/l2/"
 
    *  the request SHALL include a single Host header field containing
-      the host and optional port of the IP proxy.
+      the host and optional port of the Ethernet proxy.
 
    *  the request SHALL include a Connection header field with value
       "Upgrade" (note that this requirement is case-insensitive as per
@@ -426,7 +426,7 @@ https://${PROXY_HOST}:${PROXY_PORT}/.well-known/masque/l2/${L2_PROTOCOL}/
    immediately can start sending ethernet frames to the attached
    broadcast domain.
 
-   [[ From Client ]]             [[ From IP Proxy ]]
+   [[ From Client ]]             [[ From Ethernet Proxy ]]
 
    SETTINGS
      H3_DATAGRAM = 1

@@ -1362,7 +1362,7 @@ requirements:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
           <li class="normal" id="section-4.2-2.2">the path <span class="bcp14">SHALL</span> be "/.well-known/masque/l2/"<a href="#section-4.2-2.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-4.2-2.3">the request <span class="bcp14">SHALL</span> include a single Host header field containing the host
-and optional port of the IP proxy.<a href="#section-4.2-2.3" class="pilcrow">¶</a>
+and optional port of the Ethernet proxy.<a href="#section-4.2-2.3" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-4.2-2.4">the request <span class="bcp14">SHALL</span> include a Connection header field with value "Upgrade"
 (note that this requirement is case-insensitive as per <span><a href="https://rfc-editor.org/rfc/rfc9110#section-7.6.1" class="relref">Section 7.6.1</a> of [<a href="#HTTP" class="cite xref">HTTP</a>]</span>).<a href="#section-4.2-2.4" class="pilcrow">¶</a>
@@ -1690,7 +1690,7 @@ start sending ethernet frames to the attached broadcast domain.<a href="#section
 <figure id="figure-7">
           <div class="alignLeft art-text artwork" id="section-8.1-4.1">
 <pre>
-[[ From Client ]]             [[ From IP Proxy ]]
+[[ From Client ]]             [[ From Ethernet Proxy ]]
 
 SETTINGS
   H3_DATAGRAM = 1
