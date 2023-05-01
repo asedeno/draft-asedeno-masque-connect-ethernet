@@ -1266,7 +1266,9 @@ with EtherIP <span>[<a href="#ETHERIP" class="cite xref">ETHERIP</a>]</span>, GU
 <span>[<a href="#L2TP" class="cite xref">L2TP</a>]</span> <span>[<a href="#L2TPv3" class="cite xref">L2TPv3</a>]</span>, which imposes an additional MTU cost.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">This document describes a protocol for tunnelling Ethernet frames through an
 HTTP server acting as an Ethernet switch over HTTP. This can be used to
-establish a Layer 2 VPN.<a href="#section-1-2" class="pilcrow">¶</a></p>
+establish a Layer 2 VPN, which can then bridge two Ethernet broadcast
+domains. This can simplify connectivity to network-connected appliances that are
+configured to only interact with peers on the same Ethernet broadcast domain.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This protocol supports all existing versions of HTTP by using HTTP Datagrams
 <span>[<a href="#HTTP-DGRAM" class="cite xref">HTTP-DGRAM</a>]</span>. When using HTTP/2 <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span> or HTTP/3 <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>, it uses
 HTTP Extended CONNECT as described in <span>[<a href="#EXT-CONNECT2" class="cite xref">EXT-CONNECT2</a>]</span> and

@@ -107,7 +107,10 @@ Table of Contents
 
    This document describes a protocol for tunnelling Ethernet frames
    through an HTTP server acting as an Ethernet switch over HTTP.  This
-   can be used to establish a Layer 2 VPN.
+   can be used to establish a Layer 2 VPN, which can then bridge two
+   Ethernet broadcast domains.  This can simplify connectivity to
+   network-connected appliances that are configured to only interact
+   with peers on the same Ethernet broadcast domain.
 
    This protocol supports all existing versions of HTTP by using HTTP
    Datagrams [HTTP-DGRAM].  When using HTTP/2 [HTTP/2] or HTTP/3
