@@ -506,11 +506,6 @@ Table of Contents
               DOI 10.17487/RFC9298, August 2022,
               <https://www.rfc-editor.org/rfc/rfc9298>.
 
-   [ETHERIP]  Housley, R. and S. Hollenbeck, "EtherIP: Tunneling
-              Ethernet Frames in IP Datagrams", RFC 3378,
-              DOI 10.17487/RFC3378, September 2002,
-              <https://www.rfc-editor.org/rfc/rfc3378>.
-
    [EXT-CONNECT2]
               McManus, P., "Bootstrapping WebSockets with HTTP/2",
               RFC 8441, DOI 10.17487/RFC8441, September 2018,
@@ -570,11 +565,6 @@ Table of Contents
               STD 7, RFC 9293, DOI 10.17487/RFC9293, August 2022,
               <https://www.rfc-editor.org/rfc/rfc9293>.
 
-   [TEMPLATE] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
-              and D. Orchard, "URI Template", RFC 6570,
-              DOI 10.17487/RFC6570, March 2012,
-              <https://www.rfc-editor.org/rfc/rfc6570>.
-
 11.2.  Informative References
 
    [CONNECT-IP]
@@ -583,6 +573,11 @@ Table of Contents
               Progress, Internet-Draft, draft-ietf-masque-connect-ip-13,
               28 April 2023, <https://datatracker.ietf.org/doc/html/
               draft-ietf-masque-connect-ip-13>.
+
+   [ETHERIP]  Housley, R. and S. Hollenbeck, "EtherIP: Tunneling
+              Ethernet Frames in IP Datagrams", RFC 3378,
+              DOI 10.17487/RFC3378, September 2002,
+              <https://www.rfc-editor.org/rfc/rfc3378>.
 
    [GUE]      Herbert, T., Yong, L., and O. Zia, "Generic UDP
               Encapsulation", Work in Progress, Internet-Draft, draft-
