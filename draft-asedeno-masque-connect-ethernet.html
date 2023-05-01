@@ -1349,7 +1349,7 @@ requirements:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.1">the method <span class="bcp14">SHALL</span> be "GET".<a href="#section-3.2-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-2.2">the path <span class="bcp14">SHALL</span> be "/.well-known/masque/l2/"<a href="#section-3.2-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-2.2">the path <span class="bcp14">SHALL</span> be "/.well-known/masque/ethernet/"<a href="#section-3.2-2.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-3.2-2.3">the request <span class="bcp14">SHALL</span> include a single Host header field containing the host
 and optional port of the Ethernet proxy.<a href="#section-3.2-2.3" class="pilcrow">¶</a>
@@ -1367,7 +1367,7 @@ and <span class="bcp14">SHOULD</span> use the 400 (Bad Request) status code.<a h
 <figure id="figure-1">
           <div class="lang-http-message sourcecode" id="section-3.2-4.1">
 <pre>
-GET https://example.org/.well-known/masque/l2/ HTTP/1.1
+GET https://example.org/.well-known/masque/ethernet/ HTTP/1.1
 Host: example.org
 Connection: Upgrade
 Upgrade: connect-ethernet
@@ -1450,7 +1450,7 @@ HEADERS
 :method = CONNECT
 :protocol = connect-ethernet
 :scheme = https
-:path = /.well-known/masque/l2/
+:path = /.well-known/masque/ethernet/
 :authority = example.org
 capsule-protocol = ?1
 </pre>
@@ -1691,7 +1691,7 @@ STREAM(44): HEADERS
 :method = CONNECT
 :protocol = connect-ethernet
 :scheme = https
-:path = /.well-known/masque/l2/
+:path = /.well-known/masque/ethernet/
 :authority = proxy.example.com
 capsule-protocol = ?1
 
